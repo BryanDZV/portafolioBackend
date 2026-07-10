@@ -1,10 +1,13 @@
 package com.bryan.portafolioBackend.controller;
 
+import com.bryan.portafolioBackend.dto.ProjectRequest;
 import com.bryan.portafolioBackend.model.Project;
+
 import com.bryan.portafolioBackend.service.ProjectService;
+import jakarta.validation.Valid; // Importa esto
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -17,7 +20,6 @@ public class ProjectController {
 
     @Autowired
     private ProjectService projectService;
-
     @GetMapping
     public List<Project> getProjects() {
         return projectService.getAllProjects();
@@ -25,10 +27,12 @@ public class ProjectController {
 
     @PostMapping
     public ResponseEntity<Project> createProject(
-            @RequestParam("image") MultipartFile image,
-            @RequestParam("title") String title,
-            @RequestParam("description") String description) throws IOException {
-        Project savedProject = projectService.createProject(image, title, description);
+            @Valid @ModelAttribute ProjectRequest request,
+            @RequestParam("image") MultipartFile image) throws IOException {
+
+        // El controlador solo delega al servicio
+        Project savedProject = projectService.createProject(request, image);
+
         return ResponseEntity.ok(savedProject);
     }
 
@@ -38,13 +42,14 @@ public class ProjectController {
         return ResponseEntity.ok().build();
     }
 
+    // El PUT lo ajustaremos en el siguiente paso para que también use el DTO
     @PutMapping("/{id}")
     public ResponseEntity<Project> updateProject(
             @PathVariable UUID id,
-            @RequestParam(value = "image", required = false) MultipartFile image,
-            @RequestParam("title") String title,
-            @RequestParam("description") String description) throws IOException {
-        Project updatedProject = projectService.updateProject(id, image, title, description);
+            @Valid @ModelAttribute ProjectRequest request, // Usamos DTO aquí también
+            @RequestParam(value = "image", required = false) MultipartFile image) throws IOException {
+
+        Project updatedProject = projectService.updateProject(id, request, image);
         return ResponseEntity.ok(updatedProject);
     }
 }
