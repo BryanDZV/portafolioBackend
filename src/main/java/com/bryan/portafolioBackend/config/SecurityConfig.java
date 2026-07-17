@@ -1,5 +1,18 @@
 package com.bryan.portafolioBackend.config; // Ajusta a tu paquete
 
+/*
+ * ============================================================
+ *  CAPA CONFIG (Configuración de beans y frameworks)
+ * ============================================================
+ *  Responsabilidad: Ajustar y conectar librerías de Spring
+ *  (Security, CORS, Cloudinary, bases de datos, etc.).
+ *
+ *  - Crea @Beans que otros componentes inyectan (@Autowired).
+ *  - Define reglas globales (cors, seguridad, filtros).
+ *  - NO contiene lógica de negocio de la aplicación.
+ * ============================================================
+ */
+
 import com.bryan.portafolioBackend.security.JwtFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -15,6 +28,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
+
+//este archivo permite extraer el token de la peticion del encabezado y validar si es correcto
 public class SecurityConfig {
 
     @Autowired
@@ -30,7 +45,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/**").permitAll()
                         .anyRequest().authenticated()
                 )
-                // <-- NUEVO: Le decimos a Spring que ponga nuestro filtro ANTES que el suyo por defecto
+                // Le decimos a Spring que ponga nuestro filtro ANTES que el suyo por defecto
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
