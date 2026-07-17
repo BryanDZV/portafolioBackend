@@ -2,6 +2,7 @@ package com.bryan.portafolioBackend; // <-- Asegúrate de que coincida con tu pa
 
 import com.bryan.portafolioBackend.model.AdminUser;
 import com.bryan.portafolioBackend.model.Project;
+import com.bryan.portafolioBackend.model.ProjectCategory;
 import com.bryan.portafolioBackend.repository.ProjectRepository;
 import com.bryan.portafolioBackend.repository.UserRepository;
 import org.springframework.boot.CommandLineRunner;
@@ -35,16 +36,16 @@ public class PortafolioBackendApplication {
 				proyectoPrueba.setGithubUrl("https://github.com/tu-usuario");
 				proyectoPrueba.setLiveUrl("https://tu-web.com");
 				proyectoPrueba.setTechStack(List.of("Java", "Spring Boot", "PostgreSQL", "Docker"));
-
+				proyectoPrueba.setCategory(ProjectCategory.BACKEND);
 				projectRepository.save(proyectoPrueba);
 				System.out.println(" ¡Proyecto de prueba creado con éxito!");
 			}
 
-			// --- NUEVO: Código del Usuario Administrador ---
+			//  Código del Usuario Administrador ---
 			if (userRepository.count() == 0) {
 				AdminUser admin = new AdminUser();
 				admin.setEmail("bryan@admin.com");
-				// MUY IMPORTANTE: Nunca guardamos la contraseña en texto plano, siempre encriptada
+				// Nunca guardamos la contraseña en texto plano, siempre encriptada
 				admin.setPassword(passwordEncoder.encode("admin123"));
 
 				userRepository.save(admin);
