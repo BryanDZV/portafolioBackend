@@ -1,5 +1,19 @@
 package com.bryan.portafolioBackend.controller;
 
+/*
+ * ============================================================
+ *  CAPA CONTROLLER (Controlador / API REST)
+ * ============================================================
+ *  Responsabilidad: Recibir las peticiones HTTP del exterior
+ *  y devolver las respuestas HTTP correspondientes.
+ *
+ *  - Mapea URLs a métodos (@GetMapping, @PostMapping...).
+ *  - Extrae datos del request (@RequestBody, @RequestParam).
+ *  - Delega TODO el trabajo a la capa Service (nunca toca BD directamente).
+ *  - NO debe tener lógica de negocio, solo orquestación.
+ * ============================================================
+ */
+
 import com.bryan.portafolioBackend.dto.AuthRequest;
 import com.bryan.portafolioBackend.dto.AuthResponse;
 import com.bryan.portafolioBackend.service.AuthService;
