@@ -14,16 +14,18 @@ package com.bryan.portafolioBackend.model;
  */
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-@Entity // Le dice a Spring que esto es una tabla de base de datos
-@Table(name = "projects") // El nombre que tendrá la tabla en PostgreSQL
-@Data // Magia de Lombok: nos crea los getters y setters automáticamente
+@Entity
+@Table(name = "projects")
+@Getter
+@Setter
 public class Project {
 
     @Id // Esta es la clave primaria
