@@ -1,5 +1,18 @@
 package com.bryan.portafolioBackend.model;
 
+/*
+ * ============================================================
+ *  CAPA MODEL (Entidad / Dominio)
+ * ============================================================
+ *  Responsabilidad: Representar las tablas de la base de datos
+ *  como objetos Java (POJOs/JPA Entities).
+ *
+ *  - Define columnas, claves primarias, relaciones y constraints.
+ *  - Solo guarda estado/datos, sin lógica de negocio compleja.
+ *  - Spring/JPA se encarga de mapearla a la tabla correspondiente.
+ * ============================================================
+ */
+
 import jakarta.persistence.*;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
@@ -26,11 +39,15 @@ public class Project {
     private String liveUrl;
     private String githubUrl;
 
-    @ElementCollection // Le dice a Spring que esto es una lista de textos simples
+    @ElementCollection // esta sirve para indicar que techStack es una colección de elementos simples (Strings) y no una entidad separada
     private List<String> techStack;
 
     @CreationTimestamp // Guarda automáticamente la fecha y hora de creación
     private LocalDateTime createdAt;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private ProjectCategory category;
 
 
 }
