@@ -32,7 +32,7 @@ public class ProjectController {
             @RequestParam("image") MultipartFile image) throws IOException {
 
         // El controlador solo delega al servicio
-        Project savedProject = projectService.createProject(request, image);
+        projectService.createProject(request, image);
 
         return ResponseEntity.ok(new ApiResponse("Proyecto creado exitosamente"));
     }
@@ -49,7 +49,7 @@ public class ProjectController {
             @Valid @ModelAttribute ProjectRequest request,
             @RequestParam(value = "image", required = false) MultipartFile image) throws IOException {
 
-        Project updatedProject = projectService.updateProject(id, request, image);
+        projectService.updateProject(id, request, image);
         return ResponseEntity.ok(new ApiResponse("Proyecto actualizado exitosamente"));
     }
 }
