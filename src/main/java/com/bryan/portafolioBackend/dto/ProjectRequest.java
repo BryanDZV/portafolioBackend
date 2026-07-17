@@ -1,14 +1,9 @@
 package com.bryan.portafolioBackend.dto;
 
-import com.bryan.portafolioBackend.model.Project;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import lombok.Data;
-
-import java.util.List;
-
-
-@Data //sirve para generar automáticamente los métodos getters, setters, toString, equals y hashCode
+import lombok.Getter;
+import lombok.Setter;
 
 public class ProjectRequest {
     //la anotación @Size sirve para validar que el tamaño del campo esté entre 3 y 100 caracteres
