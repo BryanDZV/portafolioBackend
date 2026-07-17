@@ -1,5 +1,17 @@
 package com.bryan.portafolioBackend.security; // Ajusta a tu paquete
 
+/*
+ * ============================================================
+ *  CAPA SECURITY (Seguridad / Autenticación y Autorización)
+ * ============================================================
+ *  Responsabilidad: Proteger los endpoints y validar identidad.
+ *
+ *  - Filtros: interceptan peticiones para validar tokens (JWT).
+ *  - Utilidades: generan/verifican tokens y credenciales.
+ *  - Configuración: define qué rutas son públicas y cuáles privadas.
+ * ============================================================
+ */
+
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
