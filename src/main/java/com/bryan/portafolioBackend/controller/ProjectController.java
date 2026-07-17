@@ -1,5 +1,6 @@
 package com.bryan.portafolioBackend.controller;
 
+import com.bryan.portafolioBackend.dto.ApiResponse;
 import com.bryan.portafolioBackend.dto.ProjectRequest;
 import com.bryan.portafolioBackend.model.Project;
 
@@ -26,30 +27,29 @@ public class ProjectController {
     }
 
     @PostMapping
-    public ResponseEntity<Project> createProject(
+    public ResponseEntity<ApiResponse> createProject(
             @Valid @ModelAttribute ProjectRequest request,
             @RequestParam("image") MultipartFile image) throws IOException {
 
         // El controlador solo delega al servicio
         Project savedProject = projectService.createProject(request, image);
 
-        return ResponseEntity.ok(savedProject);
+        return ResponseEntity.ok(new ApiResponse("Proyecto creado exitosamente"));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteProject(@PathVariable UUID id) {
+    public ResponseEntity<ApiResponse> deleteProject(@PathVariable UUID id) {
         projectService.deleteProject(id);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(new ApiResponse("Proyecto Eliminado Correctamente"));
     }
 
-    // El PUT lo ajustaremos en el siguiente paso para que también use el DTO
     @PutMapping("/{id}")
-    public ResponseEntity<Project> updateProject(
+    public ResponseEntity<ApiResponse> updateProject(
             @PathVariable UUID id,
-            @Valid @ModelAttribute ProjectRequest request, // Usamos DTO aquí también
+            @Valid @ModelAttribute ProjectRequest request,
             @RequestParam(value = "image", required = false) MultipartFile image) throws IOException {
 
         Project updatedProject = projectService.updateProject(id, request, image);
-        return ResponseEntity.ok(updatedProject);
+        return ResponseEntity.ok(new ApiResponse("Proyecto actualizado exitosamente"));
     }
 }
