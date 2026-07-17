@@ -5,6 +5,8 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
+@Getter
+@Setter
 public class ProjectRequest {
     //la anotación @Size sirve para validar que el tamaño del campo esté entre 3 y 100 caracteres
     //sus argumentos son el mensaje que se mostrará si la validación falla
