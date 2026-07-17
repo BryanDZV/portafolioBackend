@@ -1,5 +1,18 @@
 package com.bryan.portafolioBackend.exception; // Asegúrate de que coincida con tu proyecto
 
+/*
+ * ============================================================
+ *  CAPA EXCEPTION (Manejo global de errores)
+ * ============================================================
+ *  Responsabilidad: Capturar y transformar excepciones
+ *  en respuestas HTTP limpias y amigables para el cliente.
+ *
+ *  - Usa @ControllerAdvice para vigilar todos los controllers.
+ *  - Centraliza el tratamiento de errores (validaciones, faltantes, etc.).
+ *  - Evita que stacktraces crudos lleguen al frontend.
+ * ============================================================
+ */
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
