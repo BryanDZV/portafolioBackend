@@ -9,6 +9,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
@@ -21,13 +22,14 @@ public class PortafolioBackendApplication {
 	}
 
 	// Este código se ejecuta automáticamente cada vez que le das al "Play"
+	@Profile("dev") //  código solo se ejecute en tu PC local
 	@Bean
 	CommandLineRunner initData(ProjectRepository projectRepository,
 	                           UserRepository userRepository,
 	                           PasswordEncoder passwordEncoder) {
 		return args -> {
 
-			// --- Código de los proyectos ---
+			// --- Código de los proyectos SOLO DESARROLLO NO PRODUCCION ---
 			if (projectRepository.count() == 0) {
 				Project proyectoPrueba = new Project();
 				proyectoPrueba.setTitle("Mi Primer Proyecto Spring Boot");
