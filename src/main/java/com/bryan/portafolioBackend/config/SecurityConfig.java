@@ -44,6 +44,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.GET, "/api/projects").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/health").permitAll() //para mantener vivo el back en render
                         .anyRequest().authenticated()
                 )
                 // Le decimos a Spring que ponga nuestro filtro ANTES que el suyo por defecto
