@@ -20,6 +20,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -36,12 +37,18 @@ public class SecurityConfig {
     @Autowired
     private JwtFilter jwtFilter; //  INYECTAMOS NUESTRO NUEVO FILTRO
 
+
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+                //csrf necesario cuando usamos cookies, pero como vamos a usar JWT lo desactivamos
                 .csrf(AbstractHttpConfigurer::disable)
+                //CON esta configuracion le decimos a spring que no guarde la sesion del usuario, ya que vamos a usar JWT
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+                        // 1. Las rutas de Swagger abiertas con el guardia vigilando (permitAll)
+                        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+                        // 2. Tus rutas públicas
                         .requestMatchers(HttpMethod.GET, "/api/projects").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/health").permitAll() //para mantener vivo el back en render
@@ -49,6 +56,7 @@ public class SecurityConfig {
                 )
                 // Le decimos a Spring que ponga nuestro filtro ANTES que el suyo por defecto
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+
 
         return http.build();
     }
