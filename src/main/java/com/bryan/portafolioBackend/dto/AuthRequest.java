@@ -13,10 +13,15 @@ package com.bryan.portafolioBackend.dto; // Ajusta a tu paquete
  * ============================================================
  */
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 @Data
+@Schema(description = "Solicitud de autenticación")
 public class AuthRequest {
+    @Schema(description = "Correo electrónico del usuario", example = "admin@ejemplo.com")
     private String email;
+
+    @Schema(description = "Contraseña del usuario", example = "miContraseña123")
     private String password;
 }
