@@ -7,8 +7,11 @@ import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
+import io.swagger.v3.oas.models.servers.Server;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import java.util.List;
 
 @Configuration //sirve para que Spring Boot reconozca esta clase como una clase de configuración y la procese durante el arranque de la aplicación
 
@@ -25,8 +28,15 @@ public class SwaggerConfig {
         //2. Regla de seguridad para que todas las rutas de la API requieran autenticación
         SecurityRequirement securityRequeriment=new SecurityRequirement()
                 .addList("bearerAuth");
+        //server es para que swagger pueda funcionar en local y en render, ya que render no permite usar localhost
+        Server server = new Server()
+                .url("/")//así se adapta a cualquier entorno, ya que es relativa a la raíz del dominio
+                .description("URL relativa (funciona en local y en Render)");
+
         //Objeto OpenAPI
-        return new OpenAPI().info(new Info()
+        return new OpenAPI()
+                .servers(List.of(server))//aqui agregamos el server a la configuracion de swagger
+                .info(new Info()
                 //A mi información
                 .title("API Portafolio - Bryan")
                 .version("1.0.0")
