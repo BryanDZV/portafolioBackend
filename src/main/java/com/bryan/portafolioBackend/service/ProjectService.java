@@ -15,6 +15,8 @@ package com.bryan.portafolioBackend.service;
  */
 
 import com.bryan.portafolioBackend.dto.ProjectRequest;
+import com.bryan.portafolioBackend.exception.BadRequestException;
+import com.bryan.portafolioBackend.exception.ResourceNotFoundException;
 import com.bryan.portafolioBackend.model.Project;
 import com.bryan.portafolioBackend.model.ProjectCategory;
 import com.bryan.portafolioBackend.repository.ProjectRepository;
@@ -51,7 +53,7 @@ public class ProjectService {
 
     public Project getProjectById(UUID id) {
         return projectRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Proyecto no encontrado con id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Proyecto no encontrado con id: " + id));
     }
 
     public Project createProject(ProjectRequest request, MultipartFile image) throws IOException {
@@ -68,18 +70,10 @@ public class ProjectService {
         // 2. Quitamos espacios en blanco extra (trim)
         // 3. Filtramos los que estén vacíos
         if (request.getTechStack() != null) {
-            List<String> techList = Arrays.stream(request.getTechStack().split(","))
-                    .map(String::trim)
-                    .filter(t -> !t.isEmpty())
-                    .collect(Collectors.toList());
-            project.setTechStack(techList);
+            project.setTechStack(normalizeTechStack(request.getTechStack()));
         }
         // Convertimos el string a Enum. El .toUpperCase() es por seguridad
-        try {
-            project.setCategory(ProjectCategory.valueOf(request.getCategory().toUpperCase()));
-        } catch (IllegalArgumentException e) {
-            throw new RuntimeException("Categoría no válida: " + request.getCategory());
-        }
+        project.setCategory(parseCategory(request.getCategory()));
 
         return projectRepository.save(project);
     }
@@ -100,24 +94,14 @@ public class ProjectService {
         // 3. Filtramos los que estén vacíos
         if (request.getTechStack() != null) {
             //array.stream hace que podamos trabajar con cada elemento del array de manera funcional
-            //la otra forma de hacerlo sería con un for each, pero es más verboso
+            //la otra forma de hacerlo seria con un for each, pero es mas verboso
             //split funcionaba para separar el string en un array de strings, usando la coma como delimitador
-            List<String> techList = Arrays.stream(request.getTechStack().split(","))
-                    .map(String::trim)
-                    .filter(t -> !t.isEmpty())
-                    //el collect(Collectors.toList()) convierte el stream de strings en una lista de strings
-                    //la otra forma de hacerlo sería con un for each
-                    .collect(Collectors.toList());
-            existingProject.setTechStack(techList);
+            existingProject.setTechStack(normalizeTechStack(request.getTechStack()));
         }
         existingProject.setLiveUrl(request.getLiveUrl());
         existingProject.setGithubUrl(request.getGithubUrl());
         // Convertimos el string a Enum. El .toUpperCase() es por seguridad
-        try {
-            existingProject.setCategory(ProjectCategory.valueOf(request.getCategory().toUpperCase()));
-        } catch (IllegalArgumentException e) {
-            throw new RuntimeException("Categoría no válida: " + request.getCategory());
-        }
+        existingProject.setCategory(parseCategory(request.getCategory()));
         return projectRepository.save(existingProject);
     }
 
@@ -126,8 +110,25 @@ public class ProjectService {
     public void deleteProject(UUID id) {
         // Es buena práctica verificar si existe antes de borrar
         if (!projectRepository.existsById(id)) {
-            throw new RuntimeException("No existe el proyecto con ID: " + id);
+            throw new ResourceNotFoundException("No existe el proyecto con ID: " + id);
         }
         projectRepository.deleteById(id);
+    }
+
+    // Normaliza el techStack recibido como string separado por comas a una lista limpia sin espacios
+    private List<String> normalizeTechStack(String rawTechStack) {
+        return Arrays.stream(rawTechStack.split(","))
+                .map(String::trim)
+                .filter(t -> !t.isEmpty())
+                .collect(Collectors.toList());
+    }
+
+    // Convierte el string de categoria a su enum correspondiente, lanzando BadRequestException si no es valido
+    private ProjectCategory parseCategory(String categoryStr) {
+        try {
+            return ProjectCategory.valueOf(categoryStr.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException("Categoria no valida: " + categoryStr);
+        }
     }
 }
