@@ -24,6 +24,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
 
 import java.io.IOException;
@@ -54,6 +55,15 @@ public class GlobalExceptionHandler {
         Map<String, String> error = new HashMap<>();
         error.put("error", "Falta el archivo obligatorio: " + ex.getRequestPartName());
         return ResponseEntity.badRequest().body(error);
+    }
+
+    // 3.5 Atrapa el error cuando el archivo excede el tamaño permitido (imagen muy pesada)
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<ErrorResponse> handleMaxUploadSizeExceeded(
+            MaxUploadSizeExceededException ex, WebRequest request) {
+        log.warn("Archivo demasiado grande: {}", ex.getMessage());
+        return buildErrorResponse(HttpStatus.PAYLOAD_TOO_LARGE, "Payload Too Large",
+                "El archivo excede el tamaño máximo permitido (10MB).", request);
     }
 
     // -----Manejo de Errores de Negocio y Servidor
