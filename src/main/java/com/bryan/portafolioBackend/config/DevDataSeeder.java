@@ -24,7 +24,7 @@ public class DevDataSeeder {
         return args -> {
             if (projectRepository.count() == 0) {
                 Project proyectoPrueba = new Project();
-                proyectoPrueba.setTitle("Mi Primer Proyecto Spring Boot");
+                proyectoPrueba.setTitle("Mi Proyecto Backend Portafolio Spring Boot");
                 proyectoPrueba.setDescription("Migrando mi backend desde Next.js al ecosistema Java paso a paso.");
                 proyectoPrueba.setImageUrl("https://ejemplo.com/mi-imagen.jpg");
                 proyectoPrueba.setGithubUrl("https://github.com/tu-usuario");

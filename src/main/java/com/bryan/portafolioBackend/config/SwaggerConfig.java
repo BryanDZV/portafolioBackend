@@ -42,7 +42,7 @@ public class SwaggerConfig {
                 .version("1.0.0")
                 .description("Documentación oficial de la API REST para el portafolio personal de Bryan. Incluye autenticación JWT y gestión de proyectos.")
                 .contact(new Contact()
-                        .name("Bryan Zavala")
+                        .name("Bryan Zavala Portafolio")
                         .url("https://portafolio-alpha-rosy-19.vercel.app/es")
                         .email("dev.bryanzavala@gmail.com"))
                 .license(new License()
