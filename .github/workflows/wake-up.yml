@@ -1,0 +1,13 @@
+name: Despertador Render
+
+on:
+  schedule:
+    - cron: "50 7 * * *"
+  workflow_dispatch:
+
+jobs:
+  wake-up:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Despertar el backend en Render
+        run: curl --max-time 120 https://portafolio-backend-120c.onrender.com/api/health
