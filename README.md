@@ -29,7 +29,9 @@ Imagina que esto es la cocina de un restaurante. El frontend es el comedor donde
 | Cloudinary | Alojamiento de imagenes | Guarda y optimiza las capturas de los proyectos. La capa gratuita cubre las necesidades de un portafolio. Maneja el redimensionamiento y la entrega via CDN automaticamente. |
 | Bucket4j | Limite de peticiones | Implementa el algoritmo del cubo de fichas (token bucket). Cada direccion IP recibe 10 fichas por minuto. Si las gastas todas, esperas. Protege el servidor de abusos sin bloquear el trafico legitimo. |
 | SpringDoc OpenAPI (Swagger) | Documentacion de la API | Genera documentacion interactiva automaticamente desde anotaciones en el codigo. Los desarrolladores del frontend pueden probar los endpoints directamente en el navegador en /swagger-ui.html. |
+| Spring Boot Actuator | Monitoreo | Expone endpoints de salud y metricas del servidor. Es lo que usa el "despertador" para saber si el backend esta vivo. |
 | Docker | Contenedores | Empaqueta la aplicacion con su entorno exacto. Funciona igual en mi laptop y en la nube. Se acabo el "en mi maquina si funciona". |
+| GitHub Actions | CI/CD | Automatiza tareas en cada push: compilar, probar y validar que la imagen Docker se construye. Tambien corre el "despertador" que mantiene vivo el servicio en Render. |
 | Lombok | Generacion de codigo | Elimina el codigo repetitivo (getters, setters, builders, constructores) mediante anotaciones. Menos codigo que leer y mantener. |
 | JPA / Hibernate | Acceso a base de datos | Mapea objetos Java directamente a tablas de la base de datos. Yo escribo clases Java, Hibernate escribe el SQL. Nada de armar consultas a mano para el CRUD basico. |
 | Maven | Herramienta de construccion | Maneja las dependencias y compila el proyecto de forma consistente. El wrapper (mvnw) permite que cualquiera compile sin instalar Maven globalmente. |
@@ -187,6 +189,39 @@ http://localhost:8080/api/health
 
 Debes ver: `"Backend activo y funcionando"`
 
+## Despliegue y CI/CD
+
+### Como se despliega
+
+El proyecto esta desplegado en **Render** con auto-deploy desde GitHub. Eso significa que cada vez que hago `git push` a la rama `master`, Render detecta el cambio, reconstruye la aplicacion con el `Dockerfile` y la vuelve a publicar. Yo no tengo que tocar nada.
+
+El `Dockerfile` tiene dos etapas:
+
+1. **Etapa de construccion**: compila la aplicacion usando una imagen de Maven.
+2. **Etapa de ejecucion**: copia solo el JAR en una imagen ligera de Java Alpine.
+
+Esto mantiene la imagen final pequena y rapida de desplegar.
+
+### El "despertador" (por que Render no se apaga)
+
+Render en su plan gratuito **duerme** los servicios que llevan unos 15 minutos sin recibir peticiones. Cuando alguien entra a mi portafolio despues de ese tiempo, la primera peticion tarda varios segundos en responder porque el servidor tiene que "despertarse".
+
+Para evitarlo, tengo dos piezas trabajando juntas:
+
+1. **Un cron job en la web** que hace pings al backend desde las 8:00 hasta las 00:00. Esto mantiene el servicio despierto durante el dia.
+2. **Un "despertador" en GitHub Actions** (`wake-up.yml`) que hace un unico ping a las 7:50, justo antes de que arranque el cron de la web. Asi, cuando el cron empieza a las 8:00, el servidor ya esta despierto y no se pierde el primer ping.
+
+El despertador es un workflow de GitHub Actions que se ejecuta con un cron (`50 7 * * *`) y hace un `curl` al endpoint `/api/health` con un tiempo de espera de 2 minutos, para darle tiempo a Render a encenderse por completo.
+
+### Integracion continua (CI)
+
+Ademas del despertador, tengo un workflow de CI (`ci.yml`) que se ejecuta en cada push y en cada pull request. Hace tres cosas en orden:
+
+1. **Compila y ejecuta las pruebas** con Maven, usando una base de datos PostgreSQL temporal que GitHub levanta solo para el test.
+2. **Construye la imagen Docker** para asegurarse de que el `Dockerfile` no esta roto.
+
+Si algo falla, el workflow se marca en rojo y me avisa antes de que el codigo roto llegue a produccion. Es una red de seguridad: no subo codigo que no compila o que rompe las pruebas.
+
 ## Estrategia de manejo de errores
 
 En lugar de devolver trazas de error o paginas 500 vacias, cada error llega como JSON estructurado. Esto es lo que recibe el cliente en cada situacion:
@@ -216,21 +251,9 @@ Los errores del servidor se registran internamente con la traza completa. El cli
 - **Mensajes de error genericos**: Los intentos de inicio de sesion fallidos dicen "Credenciales incorrectas" sin importar si el email existe o no. Esto evita que atacantes descubran correos validos.
 - **Control de DDL**: En produccion, la variable `DB_DDL` se configura como `validate` o `none` para que Hibernate nunca modifique el esquema de la base de datos por accidente.
 
-## Despliegue
-
-El proyecto incluye un `Dockerfile` con construccion en dos etapas:
-
-1. **Etapa de construccion**: Compila la aplicacion usando una imagen de Maven.
-2. **Etapa de ejecucion**: Copia solo el JAR en una imagen ligera de Java Alpine.
-
-Esto mantiene la imagen final pequena y rapida de desplegar.
-
-La aplicacion esta disenada para correr en cualquier plataforma que soporte Docker o Java, incluyendo Render, Railway, Fly.io o un VPS. Las variables de entorno controlan las URLs de la base de datos, los secretos y los origenes CORS para que el mismo JAR funcione en todos lados.
-
 ## Que agregaria despues
 
 - Pruebas de integracion para la capa de servicio usando una base de datos H2 en memoria.
-- Despliegue automatizado con GitHub Actions (compilar, probar, subir a Docker Hub, disparar despliegue).
 - Rotacion de token de refresco para que los usuarios sigan conectados mas tiempo sin volver a meter credenciales.
 - Paginacion en el endpoint de proyectos por si el portafolio crece a decenas de entradas.
 - Una tarea programada para limpiar los cubos de rate limiting expirados y que la memoria no crezca para siempre.
